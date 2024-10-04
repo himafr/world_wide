@@ -4,9 +4,10 @@ import { useEffect, useState } from "react";
 
 import styles from "./Form.module.css";
 import Button from "./Button";
-import BackButton from "./ButtonBack";
 import ButtonBack from "./ButtonBack";
 import { useUrlLocation } from "../hooks/useUrlLocation";
+import Spinner from "./Spinner";
+import Message from "./Message";
 
 export function convertToEmoji(countryCode) {
   const codePoints = countryCode
@@ -17,30 +18,43 @@ export function convertToEmoji(countryCode) {
 }
 
 function Form() {
-  const [isGeoLoading,setIsGeoLoading] =useState(false);
+  const [isGeoLoading, setIsGeoLoading] = useState(false);
   const [cityName, setCityName] = useState("");
   const [country, setCountry] = useState("");
   const [date, setDate] = useState(new Date());
   const [notes, setNotes] = useState("");
-  const[lat,lng]=useUrlLocation();
-  const BASE_URL='https://api.bigdatacloud.net/data/reverse-geocode-client'
-   useEffect(  function(){
-async function fetchCityData(){
-try{
-  setIsGeoLoading(true);
-  const res=await fetch(`${BASE_URL}?latitude=${lng}&longitude=${lat}`)
-  const data=await res.json();
-  setCityName(data.city||data.locality || "")
+  const [emoji, setEmoji] = useState("");
+  const [geoCodeErr, setGeoCodeErr] = useState("");
+  const [lat, lng] = useUrlLocation();
+  const BASE_URL = "https://api.bigdatacloud.net/data/reverse-geocode-client";
+  useEffect(
+    function () {
+      async function fetchCityData() {
+        try {
+          setIsGeoLoading(true);
+          setGeoCodeErr("");
+          const res = await fetch(
+            `${BASE_URL}?latitude=${lng}&longitude=${lat}`
+          );
+          const data = await res.json();
+          if (!data.countryName)
+            throw new Error("Invalid city place . pls click somewhere else");
+          setCityName(data.city || data.locality || "");
+          setCountry(data.countryName);
+          setEmoji(convertToEmoji(data.countryCode));
+        } catch (error) {
+          setGeoCodeErr(error.message);
+        } finally {
+          setIsGeoLoading(false);
+        }
+      }
+      fetchCityData();
+    },
+    [lat, lng]
+  );
 
-}catch(error){
-  console.log(error)
-}finally{
-  setIsGeoLoading(false)
-}
-}
-fetchCityData();
-    }
-    ,[lat,lng])
+  if (isGeoLoading) return <Spinner />;
+  if (geoCodeErr) return <Message message={geoCodeErr} />;
   return (
     <form className={styles.form}>
       <div className={styles.row}>
@@ -50,7 +64,7 @@ fetchCityData();
           onChange={(e) => setCityName(e.target.value)}
           value={cityName}
         />
-        {/* <span className={styles.flag}>{emoji}</span> */}
+        <span className={styles.flag}>{emoji}</span>
       </div>
 
       <div className={styles.row}>
@@ -72,8 +86,8 @@ fetchCityData();
       </div>
 
       <div className={styles.buttons}>
-      <Button  type='primary' >Add</Button>
-       <ButtonBack />
+        <Button type="primary">Add</Button>
+        <ButtonBack />
       </div>
     </form>
   );

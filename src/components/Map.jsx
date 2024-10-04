@@ -19,7 +19,7 @@ function Map() {
   return (
     <div className={styles.mapContainer}>
       <Button type="position" onClick={getPosition}>
-{isLoadingPosition?"loading...":"User Your Location"}
+{isLoadingPosition?"loading...":"Use Your Location"}
       </Button>
       <MapContainer
         center={mapPosition}
