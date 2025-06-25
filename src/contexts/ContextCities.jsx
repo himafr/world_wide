@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useReducer, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useReducer } from "react";
 
 const CitiesContext = createContext();
 const initialSate = {
@@ -7,6 +7,8 @@ const initialSate = {
   currentCity: {},
   error: "",
 };
+
+
 function reducer(state, action) {
   switch (action.type) {
     case "loading":
@@ -48,7 +50,7 @@ function reducer(state, action) {
 }
 
 function CitiesProvider({ children }) {
-  const [{cities,isLoading,currentCity,error},dispatch]=useReducer(reducer,initialSate)
+  const [{cities,isLoading,currentCity},dispatch]=useReducer(reducer,initialSate)
   useEffect(function () {
     dispatch({type:"loading"})
     async function fetchCities() {
@@ -63,7 +65,8 @@ function CitiesProvider({ children }) {
     fetchCities();
   }, []);
 
-  async function getCity(id) {
+ const getCity=useCallback( async function getCity(id) {
+    if(Number(id)== currentCity.id)return;
     dispatch({type:"loading"})
 
     try {
@@ -73,7 +76,7 @@ function CitiesProvider({ children }) {
     } catch {
       dispatch({type:"rejected",payload:"something went wrong while loading data"});
     }
-  }
+  },[currentCity.id])
   async function createCity(newCity) {
     dispatch({type:"loading"})
 
@@ -118,6 +121,7 @@ function CitiesProvider({ children }) {
     </CitiesContext.Provider>
   );
 }
+
 function useCities() {
   const context = useContext(CitiesContext);
   if (context === undefined)

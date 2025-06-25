@@ -10,7 +10,7 @@ import Spinner from "./Spinner";
 import Message from "./Message";
 import DatePicker from "react-datepicker";
 
-import "react-datepicker/dist/react-datepicker.css";
+// import "react-datepicker/dist/react-datepicker.css";
 import { useCities } from "../contexts/ContextCities";
 import { useNavigate } from "react-router-dom";
 export function convertToEmoji(countryCode) {
