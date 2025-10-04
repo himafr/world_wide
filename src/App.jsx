@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from "react";
+import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import CityList from "./components/CityList";
 import CountryList from "./components/CountryList";
@@ -8,7 +8,7 @@ import { CitiesProvider } from "./contexts/ContextCities";
 import { AuthProvider } from "./contexts/AuthContext";
 import SpinnerFullPage from "./components/SpinnerFullPage";
 
-const HomePage  =lazy(()=> import( "./pages/Homepage"));
+const HomePage  =lazy(()=> import( "./pages/HomePage"));
 const Pricing  =lazy(()=> import( "./pages/Pricing"));
 const Product  =lazy(()=> import( "./pages/Product"));
 const NotFound  =lazy(()=> import( "./pages/NotFound"));
